@@ -28,13 +28,12 @@ def place_list(request):
 
 def places_visited(request):
 	visited = Place.objects.filter(visited=True)
-	return render (request, 'travel_wishlist/visited.html', {'visited': visited})
+	return render(request, 'travel_wishlist/visited.html', {'visited': visited})
 
-def place_was_visited(request):
-	if request.method == 'POST':
-		pk = request.POST.get('pk')
-		place = get_object_or_404(Place, pk=pk)
-		place.visited = True
-		place.save()
-
-	return redirect('place_list')
+def place_was_visited(request, pk):
+    if request.method == 'POST':
+        place = get_object_or_404(Place, pk=pk)
+        place.visited = True 
+        place.save()
+    
+    return redirect('place_list')

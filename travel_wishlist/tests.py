@@ -31,4 +31,34 @@ class TestNoVisitors(TestCase):
 		self.assertTemplateUsed(response, 'travel_wishlist/visited.html')
 		self.assertMultiLineEqual('You have not visited any places yet.', 'You have not visited any places yet.', msg=None) #found on https://docs.python.org/3/library/unittest.html
 
-class TestVisitedList(TestCase)		
+class TestVisitedList(TestCase):
+	fixtures = ['test_places']
+
+	def test_visited_list(self):
+		response = self.client.get(reverse('places_visited'))
+		self.assertTemplateUsed(response, 'travel_wishlist/visited.html')
+		self.assertListEqual('', '') #found on https://docs.python.org/3/library/unittest.html
+
+class TestAddNewPlace(TestCase):
+
+	def test_add_new_unvisited_place_to_wishlist(self):
+
+		response = self.client.post(reverse('place_list'), {'name': 'Tokyo', 'visited': False}, follow=True)
+
+		#Check correct template was used
+		self.assertTemplateUsed(response, 'travel_wishlist/wishlist.html')
+
+		#what data was used to populate the template
+		response_places = response.context['places']
+
+		#Should be 1 item
+		self.assertEqual(len(response_places), 1)
+		tokyo_response = response_places[0]
+
+		#Expect this data to be in the database. Use get() to get data with
+		#the values expected. Will throw an exception if no data, or more tan
+		#own row, matches. Remember throwing an exception will cause this test to fail
+		tokyo_in_database = Place.objects.get(name='Tokyo', visited=False)
+
+		# Is the data used to render the template, the same as the data in the database?
+		self.assertEqual(tokyo_response, tokyo_in_database)

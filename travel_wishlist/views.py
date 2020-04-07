@@ -30,10 +30,11 @@ def places_visited(request):
 	visited = Place.objects.filter(visited=True)
 	return render(request, 'travel_wishlist/visited.html', {'visited': visited})
 
-def place_was_visited(request, pk):
+def place_was_visited(request):
     if request.method == 'POST':
+        pk = request.POST.get('pk')
         place = get_object_or_404(Place, pk=pk)
-        place.visited = True 
+        place.visited = True
         place.save()
     
     return redirect('place_list')
